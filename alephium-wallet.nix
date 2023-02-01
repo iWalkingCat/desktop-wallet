@@ -2,11 +2,12 @@
 
 stdenv.mkDerivation rec {
   pname = "alephium-wallet";
-  version = "0.11.1";
+  version = "1.5.0-rc.0";
 
   src = fetchurl {
-    url = "https://github.com/alephium/alephium-wallet/releases/download/v${version}/alephium-wallet-linux-${version}.AppImage";
-    sha256 = "067nqh748n02cspaa7c74qfigg1qdb4amhgaq6fwyb3j6z3m3b4j";
+    url = "https://github.com/alephium/desktop-wallet/releases/download/v${version}/Alephium-${version}.AppImage";
+    sha256 = "hMfMJcpPJWpptFN47FO8KkDsdoS6Ko1svc7vBcxOKRE=";
+
     name = "${pname}-${version}.AppImage";
   };
 
@@ -27,7 +28,7 @@ stdenv.mkDerivation rec {
     mkdir -p $out/bin $out/share/${pname} $out/share/applications
 
     cp -a ${appimageContents}/{locales,resources} $out/share/${pname}
-    cp -a ${appimageContents}/alephium.desktop $out/share/applications/${pname}.desktop
+    cp -a ${appimageContents}/${pname}.desktop $out/share/applications/${pname}.desktop
     cp -a ${appimageContents}/usr/share/icons $out/share
 
     substituteInPlace $out/share/applications/${pname}.desktop \
