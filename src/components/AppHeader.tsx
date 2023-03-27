@@ -60,6 +60,7 @@ const AppHeader: FC<AppHeader> = ({ children, title, className }) => {
 
   const isAuthenticated = !!mnemonic
   const offlineText = t('The wallet is offline.')
+
   scrollY.set(scroll?.scrollTop ?? 0)
 
   const toggleDiscreetMode = () => dispatch(discreetModeToggled())
