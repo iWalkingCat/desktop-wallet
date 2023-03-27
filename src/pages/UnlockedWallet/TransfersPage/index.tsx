@@ -51,7 +51,6 @@ interface TransfersPageProps {
 const TransfersPage = ({ className }: TransfersPageProps) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
-  const scrollDirection = useScrollDirection(20)
 
   const infoMessageClosed = useAppSelector((s) => s.global.transfersPageInfoMessageClosed)
   const addresses = useAppSelector(selectAllAddresses)
@@ -167,18 +166,26 @@ const TransfersPage = ({ className }: TransfersPageProps) => {
           hideHeader
         />
       </UnlockedWalletPanel>
-      <BottomRow animate={{ y: scrollDirection === 'down' ? 100 : 0 }}>
-        <CornerButtons>
-          <ButtonsGrid>
-            <ShortcutButtons receive send highlight />
-          </ButtonsGrid>
-        </CornerButtons>
-      </BottomRow>
+      <FloatingActions />
       <ModalPortal>
         {isSendModalOpen && <SendModalTransfer onClose={() => setIsSendModalOpen(false)} />}
         {isReceiveModalOpen && <ReceiveModal onClose={() => setIsReceiveModalOpen(false)} />}
       </ModalPortal>
     </UnlockedWalletPage>
+  )
+}
+
+const FloatingActions = () => {
+  const scrollDirection = useScrollDirection(20)
+
+  return (
+    <FloatingActionsContainer animate={{ y: scrollDirection === 'down' ? 100 : 0 }}>
+      <CornerButtons>
+        <ButtonsGrid>
+          <ShortcutButtons receive send highlight />
+        </ButtonsGrid>
+      </CornerButtons>
+    </FloatingActionsContainer>
   )
 }
 
@@ -222,7 +229,7 @@ const Buttons = styled.div`
   flex-shrink: 0;
 `
 
-const BottomRow = styled(motion.div)`
+const FloatingActionsContainer = styled(motion.div)`
   position: fixed;
   bottom: 25px;
   width: calc(100% - ${walletSidebarWidthPx}px);
