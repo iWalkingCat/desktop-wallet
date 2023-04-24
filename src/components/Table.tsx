@@ -31,16 +31,20 @@ interface TableCellProps {
 }
 
 const Table: FC<TableProps> = ({ className, children }) => (
-  <ScrollableWrapper className={className}>
-    <div role="table" tabIndex={0}>
-      {children}
-    </div>
-  </ScrollableWrapper>
+  <div role="table" tabIndex={0} className={className}>
+    {children}
+  </div>
 )
 
 export default styled(Table)`
+  width: 100%;
+  border-radius: var(--radius-big);
+  border: 1px solid ${({ theme }) => theme.border.primary};
   background-color: ${({ theme }) => theme.bg.primary};
   box-shadow: ${({ theme }) => theme.shadow.primary};
+
+  display: flex;
+  flex-direction: column;
 
   ${({ minWidth }) =>
     minWidth &&
@@ -138,13 +142,6 @@ export const TableFooter = styled(TableColumns)``
 
 export const TableCellPlaceholder = styled(TableCell)`
   color: ${({ theme }) => theme.font.secondary};
-`
-
-const ScrollableWrapper = styled.div`
-  width: 100%;
-  overflow: auto;
-  border-radius: var(--radius-big);
-  border: 1px solid ${({ theme }) => theme.border.primary};
 `
 
 export const TableHeader: FC<{ title: string; className?: string }> = ({ title, children, className }) => (

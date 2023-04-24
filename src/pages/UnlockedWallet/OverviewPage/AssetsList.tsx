@@ -17,7 +17,7 @@ along with the library. If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { motion } from 'framer-motion'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { useTheme } from 'styled-components'
 
@@ -25,6 +25,7 @@ import { fadeIn } from '@/animations'
 import Amount from '@/components/Amount'
 import AssetLogo from '@/components/AssetLogo'
 import HashEllipsed from '@/components/HashEllipsed'
+import Scrollbar from '@/components/Scrollbar'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import { TabItem } from '@/components/TabBar'
 import Table, { TableRow } from '@/components/Table'
@@ -74,50 +75,76 @@ const TokensList = ({ className, limit, addressHashes }: AssetsListProps) => {
   const assets = useAppSelector((s) => selectAddressesAssets(s, addressHashes))
   const stateUninitialized = useAppSelector(selectIsStateUninitialized)
 
+  const [canScroll, setCanScroll] = useState(false)
+
   const displayedAssets = limit ? assets.slice(0, limit) : assets
 
-  return (
-    <motion.div {...fadeIn} className={className}>
-      {displayedAssets.map((asset) => (
-        <TableRow key={asset.id} role="row" tabIndex={0}>
-          <TokenRow>
-            <AssetLogoStyled asset={asset} size={30} />
-            <NameColumn>
-              <TokenName>{asset.name ?? t('Unknown token')}</TokenName>
-              <TokenSymbol>
-                {asset.symbol ?? <HashEllipsed hash={asset.id} tooltipText={t('Copy token hash')} />}
-              </TokenSymbol>
-            </NameColumn>
-            <TableCellAmount>
-              {stateUninitialized ? (
-                <SkeletonLoader height="20px" width="30%" />
-              ) : (
-                <>
-                  <TokenAmount
-                    value={asset.balance}
+  useEffect(() => {
+    document.addEventListener('keydown', (e) => {
+      if (e.metaKey) setCanScroll(true)
+    })
+    document.addEventListener('keyup', (e) => {
+      setCanScroll(false)
+    })
+
+    return () => {
+      document.removeEventListener('keydown', (e) => {
+        if (e.metaKey) setCanScroll(true)
+      })
+      document.removeEventListener('keyup', (e) => {
+        setCanScroll(false)
+      })
+    }
+  }, [])
+
+  const assetRows = displayedAssets.map((asset) => (
+    <TableRow key={asset.id} role="row" tabIndex={0}>
+      <TokenRow>
+        <AssetLogoStyled asset={asset} size={30} />
+        <NameColumn>
+          <TokenName>{asset.name ?? t('Unknown token')}</TokenName>
+          <TokenSymbol>
+            {asset.symbol ?? <HashEllipsed hash={asset.id} tooltipText={t('Copy token hash')} />}
+          </TokenSymbol>
+        </NameColumn>
+        <TableCellAmount>
+          {stateUninitialized ? (
+            <SkeletonLoader height="20px" width="30%" />
+          ) : (
+            <>
+              <TokenAmount
+                value={asset.balance}
+                suffix={asset.symbol}
+                decimals={asset.decimals}
+                isUnknownToken={!asset.symbol}
+              />
+              {asset.lockedBalance > 0 && (
+                <AmountSubtitle>
+                  {`${t('Available')}: `}
+                  <Amount
+                    value={asset.balance - asset.lockedBalance}
                     suffix={asset.symbol}
+                    color={theme.font.tertiary}
                     decimals={asset.decimals}
                     isUnknownToken={!asset.symbol}
                   />
-                  {asset.lockedBalance > 0 && (
-                    <AmountSubtitle>
-                      {`${t('Available')}: `}
-                      <Amount
-                        value={asset.balance - asset.lockedBalance}
-                        suffix={asset.symbol}
-                        color={theme.font.tertiary}
-                        decimals={asset.decimals}
-                        isUnknownToken={!asset.symbol}
-                      />
-                    </AmountSubtitle>
-                  )}
-                  {!asset.symbol && <AmountSubtitle>{t('Raw amount')}</AmountSubtitle>}
-                </>
+                </AmountSubtitle>
               )}
-            </TableCellAmount>
-          </TokenRow>
-        </TableRow>
-      ))}
+              {!asset.symbol && <AmountSubtitle>{t('Raw amount')}</AmountSubtitle>}
+            </>
+          )}
+        </TableCellAmount>
+      </TokenRow>
+    </TableRow>
+  ))
+
+  return canScroll ? (
+    <Scrollbar translateContentSizeYToHolder className={className}>
+      <motion.div {...fadeIn}>{assetRows}</motion.div>
+    </Scrollbar>
+  ) : (
+    <motion.div {...fadeIn} className={className}>
+      {assetRows}
     </motion.div>
   )
 }

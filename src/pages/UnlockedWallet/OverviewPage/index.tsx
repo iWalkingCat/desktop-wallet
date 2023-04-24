@@ -80,14 +80,19 @@ const AssetAndAddressesRow = styled.div`
   display: flex;
   gap: 30px;
   margin-top: 100px;
+  align-items: flex-start;
 `
 
 const AssetsListStyled = styled(AssetsList)`
   flex: 2;
+  max-height: 336px;
+  overflow: hidden;
 `
 
 const AddressesContactsListStyled = styled(AddressesContactsList)`
   flex: 1;
+  max-height: 336px;
+  overflow: hidden;
 `
 
 const Shortcuts = styled(Box)`
